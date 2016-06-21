@@ -1,0 +1,14 @@
+{% extends "./layouts/default.html" %}
+
+{% block title %}
+    My New App    
+{% endblock %}
+
+{% block content %}
+    test block
+    {{ page.google | safe }}
+
+    <hr/>
+    {{ page.yahoo | safe }}
+
+{% endblock %}
