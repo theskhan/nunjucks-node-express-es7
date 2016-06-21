@@ -33,6 +33,11 @@ var paths = {
     distDir: 'dist/'
 };
 
+var vendor_libs = [
+    './node_modules/jquery/dist/jquery.min.js',
+    './node_modules/bootstrap/dist/js/bootstrap.min.js'
+];
+
 var onError = function (err) {
     gutil.beep();
     gutil.log(gutil.colors.green(err));
@@ -143,7 +148,7 @@ gulp.task('dist-fonts', ['build-fonts'], function () {
 /*
 JS Tasks
 */
-gulp.task('build-js', ['js', 'js-plugins', 'build-index-js', 'build-route-js']);
+gulp.task('build-js', ['js', 'build-vendor-libs', 'js-plugins', 'build-index-js', 'build-route-js']);
 
 gulp.task('js', function () {
     return gulp.src(paths.jsSrc + '*.+(js|map)')
@@ -153,6 +158,13 @@ gulp.task('js', function () {
         .pipe(jshint.reporter('default'))
         .pipe(babel())
         .pipe(gulp.dest(paths.buildDir + 'js'))
+        .pipe(livereload());
+});
+ 
+gulp.task('build-vendor-libs', function () {
+    return gulp.src(vendor_libs)
+        .pipe(concat('vendor_libs.js'))
+        .pipe(gulp.dest(paths.buildDir + 'js/'))
         .pipe(livereload());
 });
 
@@ -193,7 +205,14 @@ gulp.task('js-plugins', [], function () {
         .pipe(livereload());
 });
 
-gulp.task('dist-js', ['build-js', 'dist-index-js', 'dist-route-js'], function () {
+gulp.task('dist-vendor-libs', function () {
+    return gulp.src(vendor_libs)
+        .pipe(concat('vendor_libs.js'))
+        .pipe(gulp.dest(paths.distDir + 'js/'))
+        .pipe(livereload());
+});
+
+gulp.task('dist-js', ['build-js', 'dist-vendor-libs', 'dist-index-js', 'dist-route-js'], function () {
     return gulp.src(paths.buildDir + 'js/*')
         .pipe(uglify())
         .pipe(rev())
