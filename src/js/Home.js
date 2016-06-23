@@ -2,7 +2,7 @@
 
 $(document).ready(function () {
     $("#loadpersons").click((async function () {
-        let result = await client.get('http://localhost:8000/api/persons');
+        let result = await request.get('http://localhost:8000/api/persons');
 
         if (app.debug)
             console.log(result);

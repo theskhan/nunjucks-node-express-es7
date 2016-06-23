@@ -42,34 +42,6 @@ var App = function () {
 window.app = window.app || new App();
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Client = function () {
-    function Client() {
-        _classCallCheck(this, Client);
-    }
-
-    _createClass(Client, [{
-        key: 'get',
-        value: function get(url) {
-            return new Promise(function (resolve, reject) {
-                $.get(url).done(function (data) {
-                    resolve(data);
-                }).fail(function (err) {
-                    reject(err.responseText);
-                });
-            });
-        }
-    }]);
-
-    return Client;
-}();
-
-window.client = window.client || new Client();
-'use strict';
-
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 
 $(document).ready(function () {
@@ -80,7 +52,7 @@ $(document).ready(function () {
                 switch (_context.prev = _context.next) {
                     case 0:
                         _context.next = 2;
-                        return client.get('http://localhost:8000/api/persons');
+                        return request.get('http://localhost:8000/api/persons');
 
                     case 2:
                         result = _context.sent;
@@ -98,3 +70,31 @@ $(document).ready(function () {
         }, _callee, this);
     })));
 });
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Request = function () {
+    function Request() {
+        _classCallCheck(this, Request);
+    }
+
+    _createClass(Request, [{
+        key: 'get',
+        value: function get(url) {
+            return new Promise(function (resolve, reject) {
+                $.get(url).done(function (data) {
+                    resolve(data);
+                }).fail(function (err) {
+                    reject(err.responseText);
+                });
+            });
+        }
+    }]);
+
+    return Request;
+}();
+
+window.request = window.request || new Request();

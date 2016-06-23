@@ -1,6 +1,6 @@
 'use strict';
 
-class Client {
+class Request {
     get(url) {
         return new Promise((resolve, reject) => {
             $.get(url)
@@ -14,4 +14,4 @@ class Client {
     }
 }
 
-window.client = window.client || new Client();
+window.request = window.request || new Request();
