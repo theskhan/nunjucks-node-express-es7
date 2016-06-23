@@ -15,6 +15,7 @@ var nunjucks = require('nunjucks'),
 
 app.set('assets_path', process.env.NODE_ENV === 'production' ? '/' : '/');
 app.set('views', path.join(__dirname, app.get('assets_path') + '/views'));
+app.set('templates', path.join(__dirname, app.get('assets_path') + '/views'));
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -27,7 +28,7 @@ var routes = require('./routes/index'),
 
 app.set('port', process.env.PORT || 8000);
 
-nunjucks.configure(app.get('views'), {
+nunjucks.configure(app.get('templates'), {
     autoescape: true,
     noCache: true,
     watch: true,
@@ -43,6 +44,7 @@ app.use(function (req, res, next) {
     next(err);
 });
 
+// WARNING: Remove this in production else server data will leak to the client
 /*
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);

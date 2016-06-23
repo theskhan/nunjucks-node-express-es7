@@ -1,14 +1,15 @@
 var express = require('express'),
     router = express.Router();
 
-router.get('/get_json', function(req, res){
-    res.send({
-        success: true,
-        result: [{
-            a: "b",
-            b: "c"
-        }]
-    });
+router.get('/persons', function (req, res) {
+    res.send([
+        'From Server',
+        'Penney Wilmoth',
+        'Susanne Templeton',
+        'Marisha Lawson',
+        'Nellie Greenly',
+        'Karon Mckernan',
+        'Suzette Roan']);
 });
 
 module.exports = router;

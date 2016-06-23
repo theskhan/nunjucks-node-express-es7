@@ -1,6 +1,8 @@
 'use strict';
-// Dependencies
-var gulp = require('gulp'),
+
+const
+    path = require('path'),
+    gulp = require('gulp'),
     nodemon = require('gulp-nodemon'),
     notify = require('gulp-notify'),
     livereload = require('gulp-livereload'),
@@ -14,28 +16,31 @@ var gulp = require('gulp'),
     minifyHtml = require('gulp-minify-html'),
     rev = require('gulp-rev'),
     jshint = require('gulp-jshint'),
-    imagemin = require('gulp-imagemin'),
     revCollector = require('gulp-rev-collector'),
     uglify = require('gulp-uglify'),
     sass = require('gulp-sass'),
-    babel = require('gulp-babel');
+    babel = require('gulp-babel'),
+    nunjucks = require('gulp-nunjucks');
 
-var paths = {
-    fontsSrc: 'src/fonts/',
-    htmlSrc: 'src/views/',
-    sassSrc: 'src/sass/',
-    cssSrc: 'src/css/',
-    jsSrc: 'src/js/',
-    imgSrc: 'src/images/',
+const
+    paths = {
+        fontsSrc: 'src/fonts/',
+        htmlSrc: 'src/views/',
+        sassSrc: 'src/sass/',
+        cssSrc: 'src/css/',
+        jsSrc: 'src/js/',
+        imgSrc: 'src/images/',
 
-    buildDir: 'build/',
-    revDir: 'build/rev/',
-    distDir: 'dist/'
-};
+        buildDir: 'build/',
+        revDir: 'build/rev/',
+        distDir: 'dist/'
+    };
 
-var vendor_libs = [
+let vendor_libs = [
+    './node_modules/babel-polyfill/dist/polyfill.min.js',
     './node_modules/jquery/dist/jquery.min.js',
-    './node_modules/bootstrap/dist/js/bootstrap.min.js'
+    './node_modules/bootstrap/dist/js/bootstrap.min.js',
+    './node_modules/nunjucks/browser/nunjucks-slim.min.js'
 ];
 
 var onError = function (err) {
@@ -69,7 +74,7 @@ gulp.task('build', ['build-html', 'build-css', 'build-js', 'build-images', 'buil
     nodemonServerInit(paths.buildDir + 'index.js');
 });
 
-gulp.task('dist', ['dist-html', 'dist-js', 'dist-css', 'dist-images', 'dist-favicon', 'dist-fonts'], function (cb) {
+gulp.task('dist', ['dist-html', 'dist-templates', 'dist-js', 'dist-css', 'dist-images', 'dist-favicon', 'dist-fonts'], function (cb) {
     //nodemonServerInit(paths.distDir + 'index.js');
     console.log('Assets built successfully.');
 });
@@ -77,10 +82,9 @@ gulp.task('dist', ['dist-html', 'dist-js', 'dist-css', 'dist-images', 'dist-favi
 /*
 HTML Tasks
 */
-gulp.task('build-html', function () {
+gulp.task('build-html', ['build-templates'], function () {
     return gulp.src(paths.htmlSrc + '**/*.html')
-        .pipe(gulp.dest(paths.buildDir + 'views/'))
-        .pipe(livereload());
+        .pipe(gulp.dest(paths.buildDir + 'views/'));
 });
 
 gulp.task('dist-html', ['build-html', 'dist-js', 'dist-css', 'dist-images'], function () {
@@ -94,6 +98,37 @@ gulp.task('dist-html', ['build-html', 'dist-js', 'dist-css', 'dist-images'], fun
             quotes: true
         }))
         .pipe(gulp.dest(paths.distDir + 'views'));
+});
+
+gulp.task('build-templates', function () {
+    return gulp.src(paths.htmlSrc + '**/*.html')
+        .pipe(nunjucks.precompile({
+            name: function (file) {
+                let urlPath = path.dirname(file.relative) + "/" + path.basename(file.relative);
+                if (urlPath.indexOf('./') !== -1) {
+                    urlPath = urlPath.replace('./', '');
+                }
+                return urlPath;
+            }
+        }))
+        .pipe(concat('templates.js'))
+        .pipe(gulp.dest(paths.buildDir))
+        .pipe(livereload());
+});
+
+gulp.task('dist-templates', function () {
+    return gulp.src(paths.htmlSrc + '**/*.html')
+        .pipe(nunjucks.precompile({
+            name: function (file) {
+                let urlPath = path.dirname(file.relative) + "/" + path.basename(file.relative);
+                if (urlPath.indexOf('./') !== -1) {
+                    urlPath = urlPath.replace('./', '');
+                }
+                return urlPath;
+            }
+        }))
+        .pipe(concat('templates.js'))
+        .pipe(gulp.dest(paths.distDir));
 });
 
 /*
@@ -153,14 +188,13 @@ gulp.task('build-js', ['js', 'build-vendor-libs', 'js-plugins', 'build-index-js'
 gulp.task('js', function () {
     return gulp.src(paths.jsSrc + '*.+(js|map)')
         .pipe(plumber({ errorHandler: onError }))
-        .pipe(changed(paths.buildDir + 'js'))
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'))
+        .pipe(changed(paths.buildDir + 'js/'))
         .pipe(babel())
-        .pipe(gulp.dest(paths.buildDir + 'js'))
+        .pipe(concat('app.js'))
+        .pipe(gulp.dest(paths.buildDir + 'js/'))
         .pipe(livereload());
 });
- 
+
 gulp.task('build-vendor-libs', function () {
     return gulp.src(vendor_libs)
         .pipe(concat('vendor_libs.js'))
@@ -200,7 +234,7 @@ gulp.task('js-plugins', [], function () {
     return gulp.src([
         'src/lib/*.js'
     ])
-        .pipe(concat('vendor.js'))
+        .pipe(concat('vendor_plugins.js'))
         .pipe(gulp.dest(paths.buildDir + 'js/'))
         .pipe(livereload());
 });

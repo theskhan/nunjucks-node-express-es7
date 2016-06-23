@@ -1,9 +1,27 @@
-{% extends "./layouts/default.html" %}
+{% extends "layouts/default.html" %}
 
 {% block title %}
     My New App    
 {% endblock %}
 
 {% block content %}
-    
+
+    <div class="row">
+        <div class="col-md-12">
+                <h4>Data from server side:</h4>
+                {% include "includes/persons.html" %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div id="rendered">
+                    <h4>Data from client side:</h4>
+            </div>
+
+            <br/>
+            <button class="btn btn-default" id="loadpersons">Load Data</button>
+        </div>       
+    </div>
+
 {% endblock %}

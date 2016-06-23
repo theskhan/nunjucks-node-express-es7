@@ -8,20 +8,12 @@ let router = express.Router();
 
 let wrap = fn => (...args) => fn(...args).catch(args[2])
 
-router.get('/',wrap(async function(req, res, next){
-
-    let google = await request('http://www.google.com');
-
-    res.render('index.html', {
-        page: {
-            title: 'Home',
-            body_cls: 'home',
-            google: google
-        }
-    });
+router.get('/', wrap(async function (req, res, next) {
+    let persons = await request('http://localhost:8000/api/persons');
+    res.render('index.html', { persons: JSON.parse(persons) });
 }));
 
-router.get('/about', function(req, res){
+router.get('/about', function (req, res) {
     res.render('about.html');
 });
 
