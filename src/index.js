@@ -8,9 +8,8 @@ const
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser');
 
-app.set('assets_path', (process.env.NODE_ENV === 'production') ? '/' : '/');
+app.set('assets_path', (process.env.NODE_ENV === 'production') ? '/assets' : '/assets');
 app.set('views', path.join(__dirname, app.get('assets_path') + '/views'));
-app.set('templates', path.join(__dirname, app.get('assets_path') + '/views'));
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -24,7 +23,7 @@ const
 
 app.set('port', process.env.PORT || 8000);
 
-nunjucks.configure(app.get('templates'), {
+nunjucks.configure(app.get('views'), {
     autoescape: true,
     noCache: true,
     watch: true,

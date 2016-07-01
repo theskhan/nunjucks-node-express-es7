@@ -32,8 +32,10 @@ const
         imgSrc: 'src/images/',
 
         buildDir: 'build/',
+        buildAssetsDir: 'build/assets/',
         revDir: 'build/rev/',
-        distDir: 'dist/'
+        distDir: 'dist/',
+        distAssetsDir: 'dist/assets/'
     };
 
 let vendor_libs = [
@@ -84,20 +86,20 @@ HTML Tasks
 */
 gulp.task('build-html', ['build-templates'], function () {
     return gulp.src(paths.htmlSrc + '**/*.html')
-        .pipe(gulp.dest(paths.buildDir + 'views/'));
+        .pipe(gulp.dest(paths.buildAssetsDir + 'views/'));
 });
 
 gulp.task('dist-html', ['build-html', 'dist-js', 'dist-css', 'dist-images'], function () {
     return gulp.src([
         paths.revDir + "**/*.json",
-        paths.buildDir + 'views/' + "**/*.html"
+        paths.buildAssetsDir + 'views/' + "**/*.html"
     ])
         .pipe(revCollector())
         .pipe(minifyHtml({
             conditionals: true,
             quotes: true
         }))
-        .pipe(gulp.dest(paths.distDir + 'views'));
+        .pipe(gulp.dest(paths.distAssetsDir + 'views'));
 });
 
 gulp.task('build-templates', function () {
@@ -112,7 +114,7 @@ gulp.task('build-templates', function () {
             }
         }))
         .pipe(concat('templates.js'))
-        .pipe(gulp.dest(paths.buildDir))
+        .pipe(gulp.dest(paths.buildAssetsDir + 'js/'))
         .pipe(livereload());
 });
 
@@ -128,7 +130,7 @@ gulp.task('dist-templates', function () {
             }
         }))
         .pipe(concat('templates.js'))
-        .pipe(gulp.dest(paths.distDir));
+        .pipe(gulp.dest(paths.distAssetsDir + 'js/'));
 });
 
 /*
@@ -138,7 +140,7 @@ gulp.task('build-css', ['css', 'sass']);
 
 gulp.task('css', function () {
     return gulp.src(paths.cssSrc + '**/*.+(css|map)')
-        .pipe(gulp.dest(paths.buildDir + 'css/'))
+        .pipe(gulp.dest(paths.buildAssetsDir + 'css/'))
         .pipe(livereload());
 });
 
@@ -152,32 +154,32 @@ gulp.task('sass', function () {
             }
         }))
         .pipe(plumber({ errorHandler: onError }))
-        .pipe(gulp.dest(paths.buildDir + 'css/'))
+        .pipe(gulp.dest(paths.buildAssetsDir + 'css/'))
         .pipe(livereload());
 });
 
 gulp.task('dist-css', ['build-css', 'dist-images'], function () {
     return gulp.src([
-        paths.buildDir + 'css/*',
+        paths.buildAssetsDir + 'css/*',
         paths.revDir + "images/*.json"
     ])
         .pipe(revCollector())
         .pipe(minifyCSS())
         .pipe(rev())
-        .pipe(gulp.dest(paths.distDir + 'css'))
+        .pipe(gulp.dest(paths.distAssetsDir + 'css'))
         .pipe(rev.manifest())
         .pipe(gulp.dest(paths.revDir + 'css'));
 });
 
 gulp.task('build-fonts', [], function () {
     return gulp.src(paths.fontsSrc + '**/*.*')
-        .pipe(gulp.dest(paths.buildDir + 'fonts/'))
+        .pipe(gulp.dest(paths.buildAssetsDir + 'fonts/'))
         .pipe(livereload());
 });
 
 gulp.task('dist-fonts', ['build-fonts'], function () {
     return gulp.src('build/fonts/*')
-        .pipe(gulp.dest(paths.distDir + "/fonts/"));
+        .pipe(gulp.dest(paths.distAssetsDir + "/fonts/"));
 });
 
 /*
@@ -188,17 +190,17 @@ gulp.task('build-js', ['js', 'build-vendor-libs', 'js-plugins', 'build-index-js'
 gulp.task('js', function () {
     return gulp.src(paths.jsSrc + '*.+(js|map)')
         .pipe(plumber({ errorHandler: onError }))
-        .pipe(changed(paths.buildDir + 'js/'))
+        .pipe(changed(paths.buildAssetsDir + 'js/'))
         .pipe(babel())
         .pipe(concat('app.js'))
-        .pipe(gulp.dest(paths.buildDir + 'js/'))
+        .pipe(gulp.dest(paths.buildAssetsDir + 'js/'))
         .pipe(livereload());
 });
 
 gulp.task('build-vendor-libs', function () {
     return gulp.src(vendor_libs)
         .pipe(concat('vendor_libs.js'))
-        .pipe(gulp.dest(paths.buildDir + 'js/'))
+        .pipe(gulp.dest(paths.buildAssetsDir + 'js/'))
         .pipe(livereload());
 });
 
@@ -235,22 +237,22 @@ gulp.task('js-plugins', [], function () {
         'src/lib/*.js'
     ])
         .pipe(concat('vendor_plugins.js'))
-        .pipe(gulp.dest(paths.buildDir + 'js/'))
+        .pipe(gulp.dest(paths.buildAssetsDir + 'js/'))
         .pipe(livereload());
 });
 
 gulp.task('dist-vendor-libs', function () {
     return gulp.src(vendor_libs)
         .pipe(concat('vendor_libs.js'))
-        .pipe(gulp.dest(paths.distDir + 'js/'))
+        .pipe(gulp.dest(paths.distAssetsDir + 'js/'))
         .pipe(livereload());
 });
 
 gulp.task('dist-js', ['build-js', 'dist-vendor-libs', 'dist-index-js', 'dist-route-js'], function () {
-    return gulp.src(paths.buildDir + 'js/*')
+    return gulp.src(paths.buildAssetsDir + 'js/*')
         .pipe(uglify())
         .pipe(rev())
-        .pipe(gulp.dest(paths.distDir + 'js'))
+        .pipe(gulp.dest(paths.distAssetsDir + 'js'))
 
         .pipe(rev.manifest())
         .pipe(gulp.dest(paths.revDir + 'js'));
@@ -261,33 +263,33 @@ Image Tasks
 */
 gulp.task('build-images', function () {
     return gulp.src(paths.imgSrc + '**/*.+(png|jpeg|jpg|gif|svg|eps)')
-        .pipe(changed(paths.buildDir + 'images'))
-        .pipe(gulp.dest(paths.buildDir + 'images'))
+        .pipe(changed(paths.buildAssetsDir + 'images'))
+        .pipe(gulp.dest(paths.buildAssetsDir + 'images'))
         .pipe(livereload());
 });
 
 gulp.task('dist-images', ['build-images'], function () {
-    return gulp.src(paths.buildDir + 'images/**/*')
+    return gulp.src(paths.buildAssetsDir + 'images/**/*')
         .pipe(imagemin({
             progressive: true
         }))
         .pipe(rev())
-        .pipe(gulp.dest(paths.distDir + 'images'))
+        .pipe(gulp.dest(paths.distAssetsDir + 'images'))
         .pipe(rev.manifest())
         .pipe(gulp.dest(paths.revDir + 'images'));
 });
 
 gulp.task('build-favicon', function () {
     return gulp.src('src/favicon.ico')
-        .pipe(changed(paths.buildDir))
-        .pipe(gulp.dest(paths.buildDir))
+        .pipe(changed(paths.buildAssetsDir))
+        .pipe(gulp.dest(paths.buildAssetsDir))
         .pipe(livereload());
 });
 
 gulp.task('dist-favicon', ['build-favicon'], function () {
-    return gulp.src(paths.buildDir + 'favicon.ico')
-        .pipe(changed(paths.distDir))
-        .pipe(gulp.dest(paths.distDir));
+    return gulp.src(paths.buildAssetsDir + 'favicon.ico')
+        .pipe(changed(paths.distAssetsDir))
+        .pipe(gulp.dest(paths.distAssetsDir));
 });
 
 gulp.task('watch', function () {
